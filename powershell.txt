@@ -1,0 +1,54 @@
+
+
+
+
+/////Creer des OU
+New-ADOrganizationalUnit -Name "siege" -Path "DC=RSC3,DC=fr"
+New-ADOrganizationalUnit -Name "compta" -Path "OU=siege,DC=RSC3,DC=fr"
+New-ADOrganizationalUnit -Name "groupe" -Path "DC=RSC3,DC=fr"
+
+
+////Creer un User
+New-ADUser -Name "toto" -SurName "toto" -GivenName "toto" -UserPrincipalName "toto@rsc3.fr" -SamAccountName "toto" -DisplayName "toto" -AccountPassword(Read-Host -AsSecureString "toto123!") -Path "OU=compta,OU=siege,DC=RSC3,DC=fr" -Enabled $true -ChangePasswordAtLogon $true
+
+
+
+///// Creer un groupe
+New-ADGroup -Name GL -GroupScope Global -GroupCategory Security -Path "OU=compta,OU=siege,DC=RSC3,DC=fr"
+
+/////Ajouter toto pour quil soit membre d'un groupe 
+Add-ADGroupMember -Identity "GG" -Members "toto"
+
+////Ajouter un groupe pour qu'il soit memebre d'un  autre groupe 
+Add-ADGroupMember -Identity "GL" -Members "GG"
+
+///Deplacer un Utilisateur
+Move-ADObject -Identity "CN=toto,OU=compta,OU=siege,DC=RSC3,DC=fr" -TargetPath "OU=siege,DC=RSC3,DC=fr"
+
+////Renomer Utilisateur toto en toto1
+Set-ADUser -Identity "CN=toto,OU=siege,DC=RSC3,DC=fr" -DisplayName "toto1" -GivenName "toto1" -Surname "toto1" -SamAccountName "toto1" -UserPrincipalName "toto1@RSC3.fr"
+Rename-ADObject -Identity "CN=toto,OU=siege,DC=RSC3,DC=fr" -NewName "toto1"
+
+
+
+/////////Desactiver et reactiver un compte 
+Set-ADUser -Identity "CN=toto1,OU=siege,DC=RSC3,DC=fr" -Enabled $false
+/////Reactiver un compte 
+Set-ADUser -Identity "CN=toto1,OU=siege,DC=RSC3,DC=fr" -Enabled $true
+
+/////Supprimer Utilisateur 
+Remove-ADOject -Identity "CN=toto1,OU=siege,DC=RSC3,DC=fr"
+
+////Supprimer OU groupe avec tous ses elements dedans 
+Set-ADObject -Identity "OU=groupe,DC=RSC3,DC=fr" -ProtectedFromAccidentalDeletion $false
+Remove-ADObject -Identity "OU=groupe,DC=RSC3,DC=fr" -Recursive
+
+///Supprimer OU sans rien dedans 
+Remove-ADObject -Identity "OU=groupe,DC=RSC3,DC=fr"
+
+
+/////Supprimer un groupe
+Remove-ADObject -Identity "CN=GG,OU=groupe,DC=RSC3,DC=fr"
+OU ALORS
+Remove-ADGroup -Identity "CN=GG,OU=groupe,DC=RSC3,DC=fr"
+
